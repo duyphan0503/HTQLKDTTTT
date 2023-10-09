@@ -1,0 +1,78 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+header {
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    height: var(--header-height);
+}
+:root{
+    --header-height:60px;
+}
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding:10px;
+}
+
+.page-title {
+    flex-grow:2;
+    font-size: 24px;
+    text-align: center;
+}
+
+.menu-icon {
+    cursor: pointer;
+    padding: 10px;
+}
+.fa{
+    color:#fff;
+}
+/* Thiết lập kiểu cho sidebar */
+.sidebar {
+    background-color: #111;
+    width: 20vh;
+    display:none;
+    height:calc(100vh - var(--header-height));
+}
+.sidebar nav{
+    display:flex;
+    width:100%;
+}
+    .sidebar nav ul {
+        list-style: none;
+        display:flex;
+        flex-direction:column;
+        flex:1;
+    }
+
+        .sidebar nav ul li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+            padding: 10px;
+            flex:1;
+            align-items:center;
+        }
+            
+            .sidebar nav ul li a {
+                color: #fff;
+                text-decoration: none;
+                display: block;
+                flex-grow:2;
+            }
+            .sidebar nav ul li .fa{
+                padding:10px;
+            }
+/* Hiển thị sidebar khi bấm vào icon */
+.show{
+    display:flex;
+}

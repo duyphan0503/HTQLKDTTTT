@@ -1,0 +1,56 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/css/masterpage.css" rel="stylesheet" />
+    <script src="assets/js/masterpage.js"></script>
+    <link href="assets/font/fontawesome-free-6.4.2-web/css/all.css" rel="stylesheet" />
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <header>
+        <div class="header-container">
+            <div class="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1 class="page-title">Hệ thống quản lý</h1>
+        </div>
+    </header>
+    <div class="sidebar">
+        <nav>
+            <ul>
+                <li>
+                    <i class="fa fa-cart-shopping"></i>
+                    <a href="#">Quản lý Sản Phẩm</a></li>
+                <li>
+                    <i class="fa fa-box"></i>
+                    <a href="#">Quản lý Hóa Đơn</a></li>
+                <li>
+                    <i class="fa fa-users-gear"></i>
+                    <a href="#">Quản lý người dùng</a>
+                </li>
+                <li>
+                    <i class="fa fa-chart-simple"></i>
+                    <a href="#">Thống kê báo cáo</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div>
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
+        <footer>
+
+        </footer>
+    </form>
+</body>
+
+</html>
