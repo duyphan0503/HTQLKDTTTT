@@ -7,48 +7,76 @@
     <title></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="assets/css/masterpage.css" rel="stylesheet" />
+    <link href="packages/Syncfusion.EJ2.JavaScript.23.1.44/content/Content/ej2/material.css" rel="stylesheet" />
+    <script src="packages/Syncfusion.EJ2.JavaScript.23.1.44/content/Scripts/ej2/ej2.min.js"></script>
     <script src="assets/js/masterpage.js"></script>
     <link href="assets/font/fontawesome-free-6.4.2-web/css/all.css" rel="stylesheet" />
-    <asp:ContentPlaceHolder id="head" runat="server">
+    <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
 <body>
     <form id="form1" runat="server">
-    <header>
-        <div class="header-container">
-            <div class="menu-icon">
-                <i class="fas fa-bars"></i>
+        <header>
+            <div class="header-container">
+                <div class="menu-icon">
+                    <i class="fa fa-bars"></i>
+                </div>
+                <h1 class="header-title">Hệ thống quản lý kinh doanh thời trang thể thao</h1>
+                <div id="userInfo">
+                    <asp:Label ID="lblUserMenu" runat="server"></asp:Label>
+                    <i class="fa fa-chevron-down"></i>
+                </div>
+                <ul class="userDropdown">
+                    <li>
+                        <a href="Login.aspx">
+                            <i class="fa fa-right-from-bracket"></i>
+                            Đăng xuất
+                        </a>
+                    </li>
+                </ul>
             </div>
-            <h1 class="page-title">Hệ thống quản lý</h1>
-        </div>
-    </header>
-    <div class="sidebar">
-        <nav>
-            <ul>
-                <li>
-                    <i class="fa fa-cart-shopping"></i>
-                    <a href="#">Quản lý Sản Phẩm</a></li>
-                <li>
-                    <i class="fa fa-box"></i>
-                    <a href="#">Quản lý Hóa Đơn</a></li>
-                <li>
-                    <i class="fa fa-users-gear"></i>
-                    <a href="#">Quản lý người dùng</a>
-                </li>
-                <li>
-                    <i class="fa fa-chart-simple"></i>
-                    <a href="#">Thống kê báo cáo</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-    <div>
-        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
-        
-        </asp:ContentPlaceHolder>
-    </div>
-        <footer>
+        </header>
 
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li>
+                        <a href="home.aspx"><i class="fa fa-home"></i>Trang chủ</a>
+                    </li>
+                    <li>
+                        <a href="Product.aspx"><i class="fa fa-cart-shopping"></i>Quản lý Sản Phẩm</a>
+                    </li>
+                    <li>
+                        <a href="Order.aspx"><i class="fa fa-box"></i>Quản lý Đơn hàng</a></li>
+                    <li>
+                        <a href="Customer.aspx"><i class="fa fa-users-gear"></i>Quản lý khách hàng</a>
+                    </li>
+                    <li>
+                        <a href="ThongKeBaoCao.aspx"><i class="fa fa-chart-simple"></i>Thống kê báo cáo</a>
+                    </li>
+                    <li>
+                        <a href="Staff.aspx">
+                            <i class="fa fa-address-card"></i>Nhân viên
+                        </a>
+                    </li>
+                    <li>
+                        <a href="Supplier.aspx">
+                            <i class="fa fa-truck-field"></i>Nhà cung cấp
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div id="contentContainer">
+            <div class="page-title">
+                <h1 id="lblPageTitle" runat="server"></h1>
+                <hr />
+            </div>
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+        <footer>
         </footer>
     </form>
 </body>

@@ -1,132 +1,631 @@
-﻿CREATE DATABASE HTQLKDTTTT
+﻿CREATE DATABASE QLKDThoiTrangTheThao
 Go
-USE HTQLKDTTTT
+USE QLKDThoiTrangTheThao
 GO
 CREATE TABLE KhachHang
 (
-	idKH INT IDENTITY(1,1) NOT NULL,
-	TenKH NVARCHAR(100) NOT NULL,
+	MaKH VARCHAR(10) NOT NULL,
+	TenKH NVARCHAR(255) NOT NULL,
 	SDT CHAR(10),
 	DiaChi NVARCHAR(MAX),
-	Email VARCHAR(100),
-	CONSTRAINT PK_KhachHang PRIMARY KEY(idKH),
+	Email VARCHAR(255),
+	CONSTRAINT PK_KhachHang PRIMARY KEY(MaKH),
 	CONSTRAINT CHK_KhachHang_SDT CHECK(SDT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 )
-go
+GO
+
+CREATE SEQUENCE dbo.KhachHangSequence
+START WITH 1
+INCREMENT BY 1
+GO
+
+ALTER TABLE dbo.KhachHang
+ADD DEFAULT ('KH' + RIGHT('00000000'+CAST(NEXT VALUE FOR dbo.KhachHangSequence AS VARCHAR(8)),8)) FOR MaKH
+GO
+CREATE TABLE TaiKhoanKH
+(
+	idTaiKhoan INT IDENTITY(1,1) NOT NULL,
+	TenDangNhap VARCHAR(50) NOT NULL,
+	MatKhau VARCHAR(255) NOT NULL,
+	MaKH VARCHAR(10) NOT NULL,
+	CONSTRAINT PK_TaiKhoanKH PRIMARY KEY(idTaiKhoan),
+	CONSTRAINT FK_TaiKhoanKH_KhachHang FOREIGN KEY(MaKH) REFERENCES dbo.KhachHang(MaKH) ON UPDATE CASCADE ON DELETE CASCADE
+)
+GO
+
 CREATE TABLE DanhMuc
 (
 	idDanhMuc INT IDENTITY(1,1) NOT NULL,
-	TenDanhMuc NVARCHAR(50) NOT NULL,
+	TenDanhMuc NVARCHAR(255) NOT NULL,
 	CONSTRAINT PK_DanhMuc PRIMARY KEY(idDanhMuc)
 )
-go
+GO
+CREATE TABLE NhaCungCap
+(
+	MaNhaCC VARCHAR(10) NOT NULL,
+	TenNhaCC NVARCHAR(255),
+	DiaChi NVARCHAR(max),
+	SDT CHAR(10),
+	Email VARCHAR(255)
+	CONSTRAINT PK_NhaCungCap PRIMARY KEY(MaNhaCC),
+	CONSTRAINT CHK_NhaCungCap_SDT CHECK (SDT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+)
+GO 
+CREATE SEQUENCE dbo.NhaCungCapSequence
+START WITH 1
+INCREMENT BY 1
+GO
+ALTER TABLE dbo.NhaCungCap
+ADD DEFAULT ('NCC' + RIGHT('0000000' + CAST(NEXT VALUE FOR dbo.NhaCungCapSequence AS VARCHAR(7)),7)) FOR MaNhaCC
+GO
 CREATE TABLE ThuongHieu
 (
 	idThuongHieu INT IDENTITY(1,1) NOT NULL,
-	TenDanhMuc NVARCHAR(50) NOT NULL,
-	CONSTRAINT PK_ThuongHieu PRIMARY KEY(idThuongHieu)
+	TenThuongHieu NVARCHAR(255),
+	MaNhaCC VARCHAR(10) NOT NULL,
+	CONSTRAINT PK_ThuongHieu PRIMARY KEY(idThuongHieu),
+	CONSTRAINT FK_ThuongHieu_NhaCungCap FOREIGN KEY(MaNhaCC) REFERENCES dbo.NhaCungCap(MaNhaCC) ON UPDATE CASCADE ON DELETE CASCADE
+)
+GO
+CREATE TABLE KhoHang
+(
+	MaKho VARCHAR(10) NOT NULL,
+	TenKho NVARCHAR(255),
+	DiaChi NVARCHAR(MAX),
+	CONSTRAINT PK_KhoHang PRIMARY KEY(MaKho)
+)
+GO
+CREATE SEQUENCE dbo.KhoHangSequence
+START WITH 1
+INCREMENT BY 1
+GO
+ALTER TABLE dbo.KhoHang
+ADD DEFAULT ('KHO' + RIGHT('0000000' + CAST(NEXT VALUE FOR KhoHangSequence AS VARCHAR(7)),7)) FOR MaKho
+GO 
+CREATE TABLE Size
+(
+	idSize INT IDENTITY(1,1) NOT NULL,
+	Size VARCHAR(10),
+	CONSTRAINT PK_Size PRIMARY KEY(idSize)
+)
+GO
+CREATE TABLE Mau
+(
+	idMau INT IDENTITY(1,1) NOT NULL,
+	Mau VARCHAR(50),
+	CONSTRAINT PK_Mau PRIMARY KEY(idMau)
 )
 GO
 CREATE TABLE SanPham (
-	idSP INT IDENTITY(1,1) NOT NULL,
+	MaSP VARCHAR(10) NOT NULL,
 	TenSP NVARCHAR(255) NOT NULL,
-	Mota TEXT ,
-	Gia MONEY NOT NULL,
-	HinhAnh VARCHAR(255),
-	SoLuongTon INT,
+	Mota NVARCHAR(MAX) ,
+	HinhAnh VARCHAR(MAX),
+	GioiTinh NVARCHAR(50),
 	idDanhMuc INT ,
 	idThuongHieu INT,
-	CONSTRAINT PK_SanPham PRIMARY KEY(idSP),
-	CONSTRAINT FK_SanPham_DanhMuc FOREIGN KEY(idDanhMuc) REFERENCES dbo.DanhMuc(idDanhMuc),
-	CONSTRAINT FK_SanPham_ThuongHieu FOREIGN KEY(idThuongHieu) REFERENCES dbo.ThuongHieu(idThuongHieu)
+	MaKho VARCHAR(10) NOT NULL,
+	CONSTRAINT PK_SanPham PRIMARY KEY(MaSP),
+	CONSTRAINT FK_SanPham_DanhMuc FOREIGN KEY(idDanhMuc) REFERENCES dbo.DanhMuc(idDanhMuc) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_SanPham_ThuongHieu FOREIGN KEY(idThuongHieu) REFERENCES dbo.ThuongHieu(idThuongHieu) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_SanPham_KhoHang FOREIGN KEY (MaKho) REFERENCES dbo.KhoHang(MaKho) ON UPDATE CASCADE ON DELETE CASCADE
 )
-go
+GO 
+CREATE SEQUENCE dbo.SanPhamSequence
+START WITH 1
+INCREMENT BY 1
+GO
+ALTER TABLE dbo.SanPham
+ADD DEFAULT ('SP' + RIGHT('00000000'+CAST(NEXT VALUE FOR dbo.SanPhamSequence AS VARCHAR(8)),8)) FOR MaSP
+GO 
 CREATE TABLE SizeSanPham
 (
-	idSizeSP INT IDENTITY(1,1) NOT NULL,
-	idSP INT,
-	Size VARCHAR(10),
-	SoLuongTon INT,
-	CONSTRAINT PK_SizeSanPham PRIMARY KEY(idSizeSP),
-	CONSTRAINT FK_SizeSanPham FOREIGN KEY(idSP) REFERENCES dbo.SanPham(idSP)
+	idSize INT,
+	MaSP VARCHAR(10),
+	SoLuong INT,
+	CONSTRAINT PK_SizeSanPham PRIMARY KEY(idSize,MaSP),
+	CONSTRAINT FK_SizeSanPham_Size FOREIGN KEY(idSize) REFERENCES dbo.Size(idSize) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_SizeSanPham_SanPham FOREIGN KEY(MaSP) REFERENCES dbo.SanPham(MaSP) ON UPDATE CASCADE ON DELETE CASCADE
 )
-go
+GO 
+CREATE TABLE MauSanPham
+(
+	idMau INT,
+	MaSP VARCHAR(10),
+	SoLuong INT,
+	CONSTRAINT PK_MauSanPham PRIMARY KEY(idMau,MaSP),
+	CONSTRAINT FK_MauSanPham_Mau FOREIGN KEY(idMau) REFERENCES dbo.Mau(idMau) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_MauSanPham_SanPham FOREIGN KEY(MaSP) REFERENCES dbo.SanPham(MaSP) ON UPDATE CASCADE ON DELETE CASCADE
+)
+GO 
+CREATE TABLE GiaSanPham
+(
+	idGiaSP INT IDENTITY(1,1) NOT NULL,
+	Gia DECIMAL(19,3),
+	NgayBatDau DATETIME,
+	NgayKetThuc DATETIME,
+	MaSP VARCHAR(10),
+	CONSTRAINT PK_GiaSanPham PRIMARY KEY(idGiaSP),
+	CONSTRAINT FK_GiaSanPham_SanPham FOREIGN KEY(MaSP) REFERENCES dbo.SanPham(MaSP)
+		
+)
+GO
+CREATE TABLE NhanVien
+(
+	MaNV VARCHAR(10) NOT NULL,
+	HoTen NVARCHAR(100) NOT NULL,
+	NgaySinh DATE,
+	GioiTinh NVARCHAR(3),
+	DiaChi NVARCHAR(255),
+	SDT CHAR(10),
+	Email VARCHAR(50),
+	ChucVu NVARCHAR(50),
+	Luong DECIMAL(19,3),
+	CONSTRAINT PK_NhanVien PRIMARY KEY(MaNV),
+	CONSTRAINT CHK_NhanVien_SDT CHECK (SDT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+)
+GO
+CREATE SEQUENCE dbo.NhanVienSequence
+START WITH 1
+INCREMENT BY 1
+GO
+ALTER TABLE dbo.NhanVien
+ADD DEFAULT ('NV'+RIGHT('00000000'+CAST(NEXT VALUE FOR dbo.NhanVienSequence AS VARCHAR(8)),8)) FOR MaNV
+GO
+CREATE TABLE NhapHang
+(
+	MaPhieuNhap VARCHAR(10) NOT NULL,
+	NgayNhap DATETIME,
+	MaNV VARCHAR(10),
+	MaNhaCC VARCHAR(10),
+	CONSTRAINT PK_NhapHang PRIMARY KEY(MaPhieuNhap),
+	CONSTRAINT FK_NhapHang_NhanVien FOREIGN KEY(MaNV) REFERENCES dbo.NhanVien(MaNV) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_NhapHang_NhaCungCap FOREIGN KEY(MaNhaCC) REFERENCES dbo.NhaCungCap(MaNhaCC) ON UPDATE CASCADE ON DELETE CASCADE
+)
+GO
+CREATE SEQUENCE dbo.NhapHangSequence
+START WITH 1
+INCREMENT BY 1
+GO
+ALTER TABLE dbo.NhapHang
+ADD DEFAULT ('PN' + RIGHT('00000000'+CAST(NEXT VALUE FOR dbo.NhapHangSequence AS VARCHAR(8)),8)) FOR MaPhieuNhap
+GO
+CREATE TABLE ChiTietNhapHang
+(
+	MaPhieuNhap VARCHAR(10) NOT NULL,
+	MaSP VARCHAR(10) NOT NULL,
+	SoLuong INT,
+	GiaNhap DECIMAL(19,3),
+	CONSTRAINT PK_ChiTietNhapHang PRIMARY KEY(MaPhieuNhap,MaSP),
+	CONSTRAINT FK_ChiTietNhapHang_NhapHang FOREIGN KEY(MaPhieuNhap) REFERENCES dbo.NhapHang(MaPhieuNhap) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_ChiTietNhapHang_SanPham FOREIGN KEY(MaSP) REFERENCES dbo.SanPham(MaSP)
+)
+GO 
 CREATE TABLE DonHang
 (
-	idDonHang INT IDENTITY(1,1) NOT NULL,
-	idKH INT,
-	NgayDat DATE DEFAULT(GETDATE()),
-	TrangThai NVARCHAR(100) DEFAULT(N'Chờ xử lý'),
-	CONSTRAINT PK_DonHang PRIMARY KEY(idDonHang),
-	CONSTRAINT FK_DonHang_KhachHang FOREIGN KEY(idKH) REFERENCES dbo.KhachHang(idKH),
-	CONSTRAINT CHK_DonHang_TrangThai CHECK(TrangThai IN (N'Chờ xử lý',N'Đang vận chuyển',N'Đã thanh toán',N'Đã giao'))
+	MaDH VARCHAR(10) NOT NULL,
+	MaKH VARCHAR(10) NOT NULL,
+	MaNV VARCHAR(10) NOT NULL,
+	NgayDat DATETIME DEFAULT(GETDATE()),
+	TongTien DECIMAL(19,3),
+	CONSTRAINT PK_DonHang PRIMARY KEY(MaDH),
+	CONSTRAINT FK_DonHang_KhachHang FOREIGN KEY(MaKH) REFERENCES dbo.KhachHang(MaKH) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_DonHang_NhanVien FOREIGN KEY(MaNV) REFERENCES dbo.NhanVien(MaNV) ON UPDATE CASCADE ON DELETE CASCADE
 )
-go
+GO
+CREATE SEQUENCE dbo.DonHangSequence
+START WITH 1
+INCREMENT BY 1
+GO
+
+ALTER TABLE dbo.DonHang
+ADD DEFAULT ('DH' + RIGHT('00000000'+CAST(NEXT VALUE FOR dbo.DonHangSequence AS VARCHAR(8)),8)) FOR MaDH
+GO
+CREATE TABLE TrangThaiDH
+(
+	MaDH VARCHAR(10) NOT NULL,
+	ThoiGian DATETIME DEFAULT GETDATE(),
+	TrangThai NVARCHAR(255),
+	CONSTRAINT PK_TrangThaiDH PRIMARY KEY(MaDH,ThoiGian),
+	CONSTRAINT FK_TrangThaiDH FOREIGN KEY(MaDH) REFERENCES dbo.DonHang(MaDH) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT CHK_TrangThaiDH_TrangThai CHECK(TrangThai IN (N'Đã đặt hàng',N'Đang xử lý',N'Đã xác nhận',N'Đang giao hàng',N'Đã giao hàng',N'Đã hoàn thành',N'Đã hủy',N'Đang chờ hoàn hàng',N'Đang hoàn hàng',N'Đã hoàn hàng'))
+)
+GO 
 CREATE TABLE ChiTietDonHang
 (
 	idChiTietDH INT IDENTITY(1,1) NOT NULL,
-	idDonHang INT,
-	idSP INT,
+	MaDH VARCHAR(10) NOT NULL,
+	MaSP VARCHAR(10) NOT NULL,
 	SoLuong INT,
-	TongTien MONEY,
+	Gia DECIMAL(19,3),
 	CONSTRAINT PK_ChiTietDonHang PRIMARY KEY(idChiTietDH),
-	CONSTRAINT FK_ChiTietDonHang_DonHang FOREIGN KEY(idDonHang) REFERENCES dbo.DonHang(idDonHang),
-	CONSTRAINT FK_ChiTietDonHang_SanPham FOREIGN KEY(idSP) REFERENCES dbo.SanPham(idSP)
-)
-CREATE TABLE ThongKe (
-    idThongKe INT IDENTITY(1,1) NOT NULL,
-    ThoiGian DATE,
-    DoanhSo MONEY,
-    LoiNhuan MONEY,
-    TonKho INT,
-    CONSTRAINT PK_ThongKe PRIMARY KEY(idThongKe)
+	CONSTRAINT FK_ChiTietDonHang_DonHang FOREIGN KEY(MaDH) REFERENCES dbo.DonHang(MaDH) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT FK_ChiTietDonHang_SanPham FOREIGN KEY(MaSP) REFERENCES dbo.SanPham(MaSP) ON UPDATE CASCADE ON DELETE CASCADE
 )
 GO
-CREATE TABLE BaoCao (
-    idBaoCao INT IDENTITY(1,1) NOT NULL,
-    ThoiGian DATE,
-    NoiDung NVARCHAR(MAX),
-    CONSTRAINT PK_BaoCao PRIMARY KEY(idBaoCao)
-)
-Go
-INSERT INTO KhachHang (TenKH, SDT, DiaChi, Email)
-VALUES
-    (N'Nguyễn Văn A','1234567890', N'123 Đường ABC, Thành phố XYZ', 'nguyenvana@example.com'),
-    (N'Trần Thị B','0987654321', N'456 Đường XYZ, Thành phố ABC', 'tranthib@example.com'),
-    (N'Lê Hồng C','1111111111', N'789 Đường DEF, Thành phố GHI', 'lehongc@example.com')
-GO
+
+
 --DBCC CHECKIDENT(KhachHang,RESEED,0)
-go
+
+INSERT INTO KhachHang (MaKH, TenKH, SDT, DiaChi, Email)
+VALUES 
+('KH00000001', N'Nguyen Van A', '0123456789', N'DiaChi 1', 'email1@example.com'),
+('KH00000002', N'Tran Thi B', '0123456789', N'DiaChi 2', 'email2@example.com'),
+('KH00000003', N'Le Van C', '0123456789', N'DiaChi 3', 'email3@example.com'),
+('KH00000004', N'Pham Thi D', '0123456789', N'DiaChi 4', 'email4@example.com'),
+('KH00000005', N'Hoang Van E', '0123456789', N'DiaChi 5', 'email5@example.com'),
+('KH00000006', N'Nguyen Thi F', '0123456789', N'DiaChi 6', 'email6@example.com'),
+('KH00000007', N'Le Van G', '0123456789', N'DiaChi 7', 'email7@example.com'),
+('KH00000008', N'Tran Thi H', '0123456789', N'DiaChi 8', 'email8@example.com'),
+('KH00000009', N'Pham Van I', '0123456789', N'DiaChi 9', 'email9@example.com'),
+('KH00000010', N'Hoang Thi J', '0123456789', N'DiaChi 10', 'email10@example.com')
+GO
+INSERT INTO TaiKhoanKH (TenDangNhap, MatKhau, MaKH)
+VALUES 
+('user1', 'password', 'KH00000001'),
+('user2', 'password', 'KH00000002'),
+('user3', 'password', 'KH00000003'),
+('user4', 'password', 'KH00000004'),
+('user5', 'password', 'KH00000005'),
+('user6', 'password', 'KH00000006'),
+('user7', 'password', 'KH00000007'),
+('user8', 'password', 'KH00000008'),
+('user9', 'password', 'KH00000009'),
+('user10', 'password', 'KH00000010')
+GO
 INSERT INTO DanhMuc (TenDanhMuc)
-VALUES
-    (N'Áo thể thao'),
-    (N'Quần thể thao'),
-    (N'Giày thể thao')
+VALUES 
+(N'Giày thể thao'),
+(N'Áo thể thao'),
+(N'Quần thể thao'),
+(N'Balo thể thao'),
+(N'Mũ thể thao'),
+(N'Vớ thể thao'),
+(N'Đồ bơi'),
+(N'Đồ yoga'),
+(N'Đồ tập gym'),
+(N'Phụ kiện thể thao');
 GO
-INSERT INTO ThuongHieu (TenDanhMuc)
+
+INSERT INTO NhaCungCap(MaNhaCC, TenNhaCC, DiaChi, SDT, Email)
 VALUES
-    (N'Adidas'),
-    (N'Nike'),
-    (N'Puma')
-Go
-INSERT INTO SanPham (TenSP, Mota, Gia, HinhAnh, SoLuongTon, idDanhMuc, idThuongHieu)
-VALUES
-    (N'Áo thể thao Adidas', N'Mô tả sản phẩm 1', 49.99, 'hinh1.jpg', 100, 1, 1),
-    (N'Quần thể thao Nike', N'Mô tả sản phẩm 2', 29.99, 'hinh2.jpg', 50, 2, 2),
-    (N'Giày thể thao Puma', N'Mô tả sản phẩm 3', 19.99, 'hinh3.jpg', 75, 3, 3)
+('NCC0000001', N'Nhà Cung Cấp Thể Thao 1', N'Địa chỉ 1', '0123456789', 'ncc1@email.com'),
+('NCC0000002', N'Nhà Cung Cấp Thể Thao 2', N'Địa chỉ 2', '0123456789', 'ncc2@email.com'),
+('NCC0000003', N'Nhà Cung Cấp Thể Thao 3', N'Địa chỉ 3', '0123456789', 'ncc3@email.com'),
+('NCC0000004', N'Nhà Cung Cấp Thể Thao 4', N'Địa chỉ 4', '0123456789', 'ncc4@email.com'),
+('NCC0000005', N'Nhà Cung Cấp Thể Thao 5', N'Địa chỉ 5', '0123456789', 'ncc5@email.com'),
+('NCC0000006', N'Nhà Cung Cấp Thể Thao 6', N'Địa chỉ 6', '0123456789', 'ncc6@email.com'),
+('NCC0000007', N'Nhà Cung Cấp Thể Thao 7', N'Địa chỉ 7', '0123456789', 'ncc7@email.com'),
+('NCC0000008', N'Nhà Cung Cấp Thể Thao 8', N'Địa chỉ 8', '0123456789', 'ncc8@email.com'),
+('NCC0000009', N'Nhà Cung Cấp Thể Thao 9', N'Địa chỉ 9', '0123456789', 'ncc9@email.com'),
+('NCC0000010', N'Nhà Cung Cấp Thể Thao 10', N'Địa chỉ 10', '0123456789', 'ncc10@email.com');
 GO
-INSERT INTO SizeSanPham (idSP, Size, SoLuongTon)
+INSERT INTO ThuongHieu(TenThuongHieu, MaNhaCC)
 VALUES
-    (1, 'S', 10),
-    (1, 'M', 20),
-    (2, 'M', 15)
+(N'Nike', 'NCC0000001'),
+(N'Adidas', 'NCC0000002'),
+(N'Under Armor', 'NCC0000003'),
+(N'Puma', 'NCC0000004'),
+(N'Everlast', 'NCC0000005'),
+(N'Easton', 'NCC0000006'),
+(N'Louisville Slugger', 'NCC0000007'),
+(N'Ralph Lauren', 'NCC0000008'),
+(N'Fruit of the Loom', 'NCC0000009'),
+(N'Gildan Activewear', 'NCC0000010')
 GO
-INSERT INTO DonHang (idKH, NgayDat, TrangThai)
+INSERT INTO KhoHang(MaKho, TenKho, DiaChi)
 VALUES
-    (1, '2023-10-15', N'Chờ xử lý'),
-    (2, '2023-10-16', N'Đang vận chuyển')
+('KHO0000001', N'Kho Hàng 1', N'Địa chỉ 1'),
+('KHO0000002', N'Kho Hàng 2', N'Địa chỉ 2'),
+('KHO0000003', N'Kho Hàng 3', N'Địa chỉ 3');
 GO
-INSERT INTO ChiTietDonHang (idDonHang, idSP, SoLuong, TongTien)
+INSERT INTO Size(Size)
 VALUES
-    (1, 1, 2, 99.98),
-    (2, 2, 1, 29.99)
+('S'),
+('M'),
+('L'),
+('XL'),
+('XXL'),
+('XXL')
+GO
+INSERT INTO Mau(Mau)
+VALUES
+(N'Đỏ'),
+(N'Xanh'),
+(N'Vàng'),
+(N'Đen'),
+(N'Trắng'),
+(N'Xám'),
+(N'Nâu'),
+(N'Bạc'),
+(N'Vàng kim'),
+(N'Hồng')
+GO
+INSERT INTO SanPham(MaSP, TenSP, Mota, HinhAnh, GioiTinh, idDanhMuc, idThuongHieu, MaKho)
+VALUES
+('SP00000001', N'Giày Thể Thao Nike', N'Giày thể thao Nike chất lượng cao', 'URL hình ảnh', N'Nam', 1, 1, 'KHO0000001'),
+('SP00000002', N'Áo Thể Thao Adidas', N'Áo thể thao Adidas thoáng mát', 'URL hình ảnh', N'Nữ', 2, 2, 'KHO0000002'),
+('SP00000003', N'Quần Thể Thao Under Armor', N'Quần thể thao Under Armor thoải mái', 'URL hình ảnh', N'Nam', 3, 3, 'KHO0000003'),
+('SP00000004', N'Balo Thể Thao Puma', N'Balo thể thao Puma tiện lợi', 'URL hình ảnh', N'Unisex', 4, 4, 'KHO0000001'),
+('SP00000005', N'Nón Thể Thao Everlast', N'Nón thể thao Everlast thời trang', 'URL hình ảnh', N'Nữ', 5, 5, 'KHO0000002'),
+('SP00000006', N'Giày Thể Thao Easton', N'Giày thể thao Easton bền bỉ', 'URL hình ảnh', N'Nam', 1, 6, 'KHO0000001'),
+('SP00000007', N'Áo Thể Thao Louisville Slugger', N'Áo thể thao Louisville Slugger năng động', 'URL hình ảnh', N'Nữ', 2, 7, 'KHO0000002'),
+('SP00000008', N'Quần Thể Thao Ralph Lauren', N'Quần thể thao Ralph Lauren sang trọng', 'URL hình ảnh', N'Nam', 3, 8, 'KHO0000003'),
+('SP00000009', N'Balo Thể Thao Fruit of the Loom', N'Balo thể thao Fruit of the Loom đa năng', 'URL hình ảnh', N'Unisex', 4, 9, 'KHO0000001'),
+('SP00000010', N'Nón Thể Thao Gildan Activewear', N'Nón thể thao Gildan Activewear cá tính', 'URL hình ảnh', N'Nữ', 5, 10, 'KHO0000002')
+GO
+INSERT INTO SizeSanPham(idSize, MaSP, SoLuong)
+VALUES
+(1, 'SP00000001', 100),
+(2, 'SP00000001', 200),
+(3, 'SP00000001', 150),
+
+(1, 'SP00000002', 120),
+(2, 'SP00000002', 180),
+
+(1, 'SP00000003', 130),
+(2, 'SP00000003', 170),
+(3, 'SP00000003', 160),
+
+(1, 'SP00000004', 140),
+(2, 'SP00000004', 160),
+(3, 'SP00000004', 180),
+
+(1, 'SP00000005', 150),
+(2, 'SP00000005', 170),
+
+(1, 'SP00000006', 130),
+(2, 'SP00000006', 150),
+(3, 'SP00000006', 170),
+
+(1, 'SP00000007', 120),
+(2, 'SP00000007', 140),
+(3, 'SP00000007', 160),
+
+(1, 'SP00000008', 150),
+(2, 'SP00000008', 170),
+
+(1, 'SP00000009', 130),
+(2, 'SP00000009', 150),
+(3, 'SP00000009', 170),
+
+(1, 'SP00000010', 140),
+(2, 'SP00000010', 160),
+(3, 'SP00000010', 180)
+GO
+INSERT INTO MauSanPham(idMau, MaSP, SoLuong)
+VALUES
+(1, 'SP00000001', 100),
+(2, 'SP00000001', 200),
+(3, 'SP00000001', 150),
+
+(1, 'SP00000002', 120),
+(2, 'SP00000002', 180),
+
+(1, 'SP00000003', 130),
+(2, 'SP00000003', 170),
+(3, 'SP00000003', 160),
+
+(1, 'SP00000004', 140),
+(2, 'SP00000004', 160),
+(3, 'SP00000004', 180),
+
+(1, 'SP00000005', 150),
+(2, 'SP00000005', 170),
+
+(1, 'SP00000006', 130),
+(2, 'SP00000006', 150),
+(3, 'SP00000006', 170),
+
+(1, 'SP00000007', 120),
+(2, 'SP00000007', 140),
+(3, 'SP00000007', 160),
+
+(1, 'SP00000008', 150),
+(2, 'SP00000008', 170),
+
+(1, 'SP00000009', 130),
+(2, 'SP00000009', 150),
+(3, 'SP00000009', 170),
+
+(1, 'SP00000010', 140),
+(2, 'SP00000010', 160),
+(3, 'SP00000010', 180)
+GO
+INSERT INTO GiaSanPham(Gia, NgayBatDau, NgayKetThuc, MaSP)
+VALUES
+(1000000, '2023-01-01', '2023-12-31', 'SP00000001'),
+(2000000, '2023-01-01', '2023-12-31', 'SP00000002'),
+(1500000, '2023-01-01', '2023-12-31', 'SP00000003'),
+(1400000, '2023-01-01', '2023-12-31', 'SP00000004'),
+(1700000, '2023-01-01', '2023-12-31', 'SP00000005'),
+(1300000, '2023-01-01', '2023-12-31', 'SP00000006'),
+(1200000, '2023-01-01', '2023-12-31', 'SP00000007'),
+(1500000, '2023-01-01', '2023-12-31', 'SP00000008'),
+(1300000, '2023-01-01', '2023-12-31', 'SP00000009'),
+(1400000, '2023-01-01', '2023-12-31', 'SP00000010')
+GO
+INSERT INTO NhanVien(MaNV, HoTen, NgaySinh, GioiTinh, DiaChi, SDT, Email, ChucVu, Luong)
+VALUES
+('NV00000001', N'Nhân Viên 1', '1990-01-01', N'Nam', N'Địa chỉ 1', '0123456789', 'nv1@email.com', N'Nhân viên bán hàng', 10000000),
+('NV00000002', N'Nhân Viên 2', '1990-01-01', N'Nữ', N'Địa chỉ 2', '0123456789', 'nv2@email.com', N'Nhân viên bán hàng', 20000000),
+('NV00000003', N'Nhân Viên 3', '1990-01-01', N'Nam', N'Địa chỉ 3', '0123456789', 'nv3@email.com', N'Nhân viên bán hàng', 15000000),
+('NV00000004', N'Nhân Viên 4', '1990-01-01', N'Nữ', N'Địa chỉ 4', '0123456789', 'nv4@email.com', N'Nhân viên bán hàng', 12000000),
+('NV00000005', N'Nhân Viên 5', '1990-01-01', N'Nam', N'Địa chỉ 5', '0123456789', 'nv5@email.com', N'Nhân viên bán hàng', 18000000),
+('NV00000006', N'Nhân Viên 6', '1990-01-01', N'Nữ', N'Địa chỉ 6', '0123456789', 'nv6@email.com', N'Nhân viên bán hàng', 13000000),
+('NV00000007', N'Nhân Viên 7', '1990-01-01', N'Nam', N'Địa chỉ 7', '0123456789', 'nv7@email.com', N'Nhân viên bán hàng', 17000000),
+('NV00000008', N'Nhân Viên 8', '1990-01-01', N'Nữ', N'Địa chỉ 8', '0123456789', 'nv8@email.com', N'Nhân viên bán hàng', 16000000),
+('NV00000009', N'Nhân Viên 9', '1990-01-01', N'Nam', N'Địa chỉ 9', '0123456789', 'nv9@email.com', N'Nhân viên bán hàng', 14000000),
+('NV00000010', N'Nhân Viên 10', '1990-01-01', N'Nữ', N'Địa chỉ 10', '0123456789', 'nv10@email.com', N'Nhân viên bán hàng', 19000000)
+GO
+INSERT INTO NhapHang(MaPhieuNhap, NgayNhap, MaNV, MaNhaCC)
+VALUES
+('PN00000001', '2023-01-01', 'NV00000001', 'NCC0000001'),
+('PN00000002', '2023-01-02', 'NV00000002', 'NCC0000002'),
+('PN00000003', '2023-01-03', 'NV00000003', 'NCC0000003'),
+('PN00000004', '2023-01-04', 'NV00000004', 'NCC0000004'),
+('PN00000005', '2023-01-05', 'NV00000005', 'NCC0000005'),
+('PN00000006', '2023-01-06', 'NV00000006', 'NCC0000006'),
+('PN00000007', '2023-01-07', 'NV00000007', 'NCC0000007'),
+('PN00000008', '2023-01-08', 'NV00000008', 'NCC0000008'),
+('PN00000009', '2023-01-09', 'NV00000009', 'NCC0000009'),
+('PN00000010', '2023-01-10', 'NV00000010', 'NCC0000010')
+GO
+INSERT INTO ChiTietNhapHang(MaPhieuNhap, MaSP, SoLuong, GiaNhap)
+VALUES
+('PN00000001', 'SP00000001', 100, 1000000),
+('PN00000001', 'SP00000002', 200, 2000000),
+('PN00000001', 'SP00000003', 150, 1500000),
+
+('PN00000002', 'SP00000004', 120, 1200000),
+('PN00000002', 'SP00000005', 180, 1800000),
+
+('PN00000003', 'SP00000006', 130, 1300000),
+('PN00000003', 'SP00000007', 170, 1700000),
+('PN00000003', 'SP00000008', 160, 1600000),
+
+('PN00000004', 'SP00000009', 140, 1400000),
+('PN00000004', 'SP00000010', 160, 1600000),
+('PN00000004', 'SP00000001', 180, 1800000),
+
+('PN00000005', 'SP00000002', 150, 1500000),
+('PN00000005', 'SP00000003', 170, 1700000),
+
+('PN00000006', 'SP00000004', 130, 1300000),
+('PN00000006', 'SP00000005', 150, 1500000),
+('PN00000006', 'SP00000006', 170, 1700000),
+
+('PN00000007', 'SP00000007', 120, 1200000),
+('PN00000007', 'SP00000008', 140, 1400000),
+('PN00000007', 'SP00000009', 160, 1600000),
+
+('PN00000008', 'SP00000010', 150, 1500000),
+('PN00000008', 'SP00000001', 170, 1700000),
+
+('PN00000009', 'SP00000002', 130, 1300000),
+('PN00000009', 'SP00000003', 150, 1500000),
+('PN00000009', 'SP00000004', 170, 1700000),
+
+('PN00000010', 'SP00000005', 140, 1400000),
+('PN00000010', 'SP00000006', 160, 1600000),
+('PN00000010', 'SP00000007', 180, 1800000)
+GO
+INSERT INTO DonHang(MaDH, MaKH, MaNV, NgayDat, TongTien)
+VALUES
+('DH00000001', 'KH00000001', 'NV00000001', '2023-01-01', 1000000),
+('DH00000002', 'KH00000002', 'NV00000002', '2023-01-02', 2000000),
+('DH00000003', 'KH00000003', 'NV00000003', '2023-01-03', 1500000),
+('DH00000004', 'KH00000004', 'NV00000004', '2023-01-04', 1200000),
+('DH00000005', 'KH00000005', 'NV00000005', '2023-01-05', 1800000),
+('DH00000006', 'KH00000006', 'NV00000006', '2023-01-06', 1300000),
+('DH00000007', 'KH00000007', 'NV00000007', '2023-01-07', 1700000),
+('DH00000008', 'KH00000008', 'NV00000008', '2023-01-08', 1600000),
+('DH00000009', 'KH00000009', 'NV00000009', '2023-01-09', 1400000),
+('DH00000010', 'KH00000010', 'NV00000010', '2023-01-10', 1900000)
+GO
+INSERT INTO ChiTietDonHang(MaDH, MaSP, SoLuong, Gia)
+VALUES
+('DH00000001', 'SP00000001', 1, 1000000),
+('DH00000001', 'SP00000002', 2, 2000000),
+
+('DH00000002', 'SP00000003', 1, 1500000),
+('DH00000002', 'SP00000004', 2, 1200000),
+
+('DH00000003', 'SP00000005', 1, 1800000),
+('DH00000003', 'SP00000006', 2, 1300000),
+
+('DH00000004', 'SP00000007', 1, 1200000),
+('DH00000004', 'SP00000008', 2, 1400000),
+
+('DH00000005', 'SP00000009', 1, 1600000),
+('DH00000005', 'SP00000010', 2, 1900000),
+
+('DH00000006', 'SP00000001', 1, 1000000),
+('DH00000006', 'SP00000002', 2, 2000000),
+
+('DH00000007', 'SP00000003', 1, 1500000),
+('DH00000007', 'SP00000004', 2, 1200000),
+
+('DH00000008', 'SP00000005', 1, 1800000),
+('DH00000008', 'SP00000006', 2, 1300000),
+
+('DH00000009', 'SP00000007', 1, 1700000),
+('DH00000009', 'SP00000008', 2, 1600000),
+
+('DH00000010', 'SP00000009', 1, 1400000),
+('DH00000010', 'SP00000010', 2, 1900000)
+GO
+INSERT INTO TrangThaiDH (MaDH, ThoiGian, TrangThai)
+VALUES
+('DH00000001', '2023-01-01 10:00:00', N'Đã đặt hàng'),
+('DH00000001', '2023-01-01 11:00:00', N'Đang xử lý'),
+('DH00000001', '2023-01-01 12:00:00', N'Đã xác nhận'),
+('DH00000001', '2023-01-01 13:00:00', N'Đang giao hàng'),
+('DH00000001', '2023-01-01 14:00:00', N'Đã giao hàng'),
+('DH00000001', '2023-01-01 15:00:00', N'Đã hoàn thành'),
+
+('DH00000002', '2023-01-02 10:00:00', N'Đã đặt hàng'),
+('DH00000002', '2023-01-02 11:00:00', N'Đang xử lý'),
+('DH00000002', '2023-01-02 12:00:00', N'Đã xác nhận'),
+('DH00000002', '2023-01-02 13:00:00', N'Đang giao hàng'),
+('DH00000002', '2023-01-02 14:00:00', N'Đã giao hàng'),
+('DH00000002', '2023-01-02 15:00:00', N'Đã hoàn thành'),
+
+('DH00000003', '2023-01-03 10:00:00', N'Đã đặt hàng'),
+('DH00000003', '2023-01-03 11:00:00', N'Đang xử lý'),
+('DH00000003', '2023-01-03 12:00:00', N'Đã xác nhận'),
+('DH00000003', '2023-01-03 13:00:00', N'Đang giao hàng'),
+('DH00000003', '2023-01-03 14:00:00', N'Đã giao hàng'),
+('DH00000003', '2023-01-03 15:00:00', N'Đã hoàn thành'),
+
+('DH00000004', '2023-01-04 10:00:00', N'Đã đặt hàng'),
+('DH00000004', '2023-01-04 11:00:00', N'Đang xử lý'),
+('DH00000004', '2023-01-04 12:00:00', N'Đã xác nhận'),
+('DH00000004', '2023-01-04 13:00:00', N'Đang giao hàng'),
+('DH00000004', '2023-01-04 14:00:00', N'Đã giao hàng'),
+('DH00000004', '2023-01-04 15:00:00', N'Đã hoàn thành'),
+('DH00000004', '2023-01-04 16:00:00', N'Đã hủy'),
+
+('DH00000009', '2023-01-09 10:00:00', N'Đã đặt hàng'),
+('DH00000009', '2023-01-09 11:00:00', N'Đang xử lý'),
+('DH00000009', '2023-01-09 12:00:00', N'Đã xác nhận'),
+('DH00000009', '2023-01-09 13:00:00', N'Đang giao hàng'),
+('DH00000009', '2023-01-09 14:00:00', N'Đã giao hàng'),
+('DH00000009', '2023-01-09 15:00:00', N'Đã hoàn thành'),
+
+
+('DH00000005', '2023-01-05 10:00:00', N'Đã đặt hàng'),
+('DH00000005', '2023-01-05 11:00:00', N'Đang xử lý'),
+('DH00000005', '2023-01-05 12:00:00', N'Đã xác nhận'),
+('DH00000005', '2023-01-05 13:00:00', N'Đang giao hàng'),
+('DH00000005', '2023-01-05 14:00:00', N'Đã giao hàng'),
+('DH00000005', '2023-01-05 15:00:00', N'Đã hoàn thành'),
+
+('DH00000006', '2023-01-06 10:00:00', N'Đã đặt hàng'),
+('DH00000006', '2023-01-06 11:00:00', N'Đang xử lý'),
+('DH00000006', '2023-01-06 12:00:00', N'Đã xác nhận'),
+('DH00000006', '2023-01-06 13:00:00', N'Đang giao hàng'),
+('DH00000006', '2023-01-06 14:00:00', N'Đã giao hàng'),
+('DH00000006', '2023-01-06 15:00:00', N'Đã hoàn thành'),
+
+('DH00000007', '2023-01-07 10:00:00', N'Đã đặt hàng'),
+('DH00000007', '2023-01-07 11:00:00', N'Đang xử lý'),
+('DH00000007', '2023-01-07 12:00:00', N'Đã xác nhận'),
+('DH00000007', '2023-01-07 13:00:00', N'Đang giao hàng'),
+('DH00000007', '2023-01-07 14:00:00', N'Đã giao hàng'),
+('DH00000007', '2023-01-07 15:00:00', N'Đã hoàn thành'),
+
+('DH00000008', '2023-01-08 10:00:00', N'Đã đặt hàng'),
+('DH00000008', '2023-01-08 11:00:00', N'Đang xử lý'),
+('DH00000008', '2023-01-08 12:00:00', N'Đã xác nhận'),
+('DH00000008', '2023-01-08 13:00:00', N'Đang giao hàng'),
+('DH00000008', '2023-01-08 14:00:00', N'Đã giao hàng'),
+('DH00000008', '2023-01-08 15:00:00', N'Đã hoàn thành'),
+
+('DH00000010', '2023-01-10 10:00:00', N'Đã đặt hàng'),
+('DH00000010', '2023-01-10 11:00:00', N'Đang xử lý'),
+('DH00000010', '2023-01-10 12:00:00', N'Đã xác nhận'),
+('DH00000010', '2023-01-10 13:00:00', N'Đang giao hàng'),
+('DH00000010', '2023-01-10 14:00:00', N'Đã giao hàng'),
+('DH00000010', '2023-01-10 15:00:00', N'Đã hoàn thành')
+GO

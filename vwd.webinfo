@@ -4,5 +4,5 @@
 -->
 <VisualWebDeveloper>
 
-  <iisExpressSettings sslPort="44392" windowsAuthentication="disabled" anonymousAuthentication="enabled" useClassicPipelineMode="false"/>
+  <iisExpressSettings sslPort="44341" windowsAuthentication="disabled" anonymousAuthentication="enabled" useClassicPipelineMode="false"/>
 </VisualWebDeveloper>

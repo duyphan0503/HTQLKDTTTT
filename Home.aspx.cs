@@ -9,6 +9,6 @@ public partial class Home : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        ((MasterPage)Page.Master).PageTitle = "Trang chủ".ToUpper();
     }
 }
